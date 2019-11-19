@@ -473,6 +473,17 @@ class IslandoraSolrResults {
           // Strip brackets.
           $value = str_replace(array('(', ')'), '', $value);
         }
+
+        // If a collection is included in the breadcrumb, let's use its label.
+        $fedora_regex = '/info.*fedora/';
+        $different_nothings = '/[\/\\\\]/';
+        if (preg_match($fedora_regex, $value)) {
+          $pid = preg_split($fedora_regex, $value);
+          $pid = preg_replace($different_nothings, '', $pid[1]);
+          if ($object = islandora_object_load($pid)) {
+            $value = $object->label ? $object->label : $value;
+           }
+        }
         $query_implode[] = $value;
       }
       $query_value = implode(" ", $query_implode);
